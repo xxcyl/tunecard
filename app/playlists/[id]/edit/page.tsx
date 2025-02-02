@@ -15,10 +15,10 @@ interface Track {
   id: string
   title: string
   artist: string
-  album?: string
+  album?: string | null
   duration?: number | null
   image?: string | null
-  youtube_link?: string
+  youtube_link?: string | null
   lastfm_link?: string | null
   position: number
 }
@@ -27,10 +27,10 @@ interface SearchResult {
   id?: string
   title: string
   artist: string
-  album?: string
+  album?: string | null
   duration?: number | null
   image: string | null
-  youtube_link?: string
+  youtube_link?: string | null
   lastfm_link?: string | null
 }
 

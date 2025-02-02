@@ -25,11 +25,11 @@ interface SearchResult {
   id?: string
   title: string
   artist: string
-  album?: string
+  album?: string | null
   duration?: number | null
   image: string | null
-  lastfm_link?: string
-  youtube_link?: string
+  lastfm_link?: string | null
+  youtube_link?: string | null
 }
 
 export default function CreatePlaylist() {
