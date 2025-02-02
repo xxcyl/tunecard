@@ -166,7 +166,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
       const { error: tracksError } = await supabase
         .from('playlist_tracks')
         .insert(
-          tracks.map((track, index) => ({
+          tracks.map((track: Track, index: number) => ({
             playlist_id: params.id,
             title: track.title,
             artist: track.artist,
@@ -195,7 +195,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
     setTracks(tracks.filter((_, i) => i !== index))
   }
 
-  const onDragEnd = (result: any) => {
+  const onDragEnd = (result: { destination?: { index: number }, source: { index: number } }) => {
     if (!result.destination) return
 
     const items = Array.from(tracks)
