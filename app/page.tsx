@@ -31,7 +31,8 @@ async function getPlaylists() {
       .from('playlists')
       .select(`
         *,
-        profiles:user_id(username)
+        profiles:user_id(username, avatar_url),
+        playlist_tracks(count)
       `)
       .order('created_at', { ascending: false })
       .limit(10)
@@ -151,16 +152,32 @@ export default async function Home() {
                 <Link 
                   key={playlist.id}
                   href={`/playlists/${playlist.id}`}
-                  className="block hover:scale-105 transition-transform"
+                  className="block group"
                 >
-                  <Card>
-                    <CardContent className="p-6">
-                      <h3 className="text-lg font-semibold text-center mb-2 truncate">
-                        {playlist.name}
-                      </h3>
-                      <p className="text-sm text-gray-500 text-center line-clamp-2">
-                        {playlist.description || '沒有簡介'}
-                      </p>
+                  <Card className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1">
+                    <CardContent className="p-6 bg-gradient-to-br from-white to-purple-50">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold truncate flex-1">
+                          {playlist.name}
+                        </h3>
+                        <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-full">
+                          <Music className="w-4 h-4 text-purple-600" />
+                        </div>
+                      </div>
+                      {playlist.description && (
+                        <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                          {playlist.description}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <Headphones className="w-4 h-4" />
+                          {playlist.playlist_tracks.length} 首歌曲
+                        </span>
+                        <span>
+                          by {playlist.profiles.username || '匿名用戶'}
+                        </span>
+                      </div>
                     </CardContent>
                   </Card>
                 </Link>

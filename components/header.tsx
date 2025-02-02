@@ -43,45 +43,52 @@ export function Header() {
   }
 
   return (
-    <header className="bg-background border-b">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <Link href="/" className="flex items-center space-x-2">
+    <header className="bg-background border-b sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center space-x-2 mr-6">
             <Music className="h-6 w-6" />
-            <span className="text-xl font-bold">TuneCard</span>
+            <span className="text-xl font-bold hidden sm:inline">TuneCard</span>
           </Link>
-          <nav className="flex items-center space-x-4">
+          <nav className="flex items-center space-x-2 sm:space-x-4">
             {user && (
               <>
                 <Link 
                   href="/create-playlist" 
-                  className="text-primary hover:text-primary/80"
+                  className="text-primary hover:text-primary/80 text-sm sm:text-base px-2 py-1 rounded-md hover:bg-primary/10 transition-colors"
                 >
-                  創建 TuneCard
+                  建立
+                  <span className="hidden sm:inline"> TuneCard</span>
                 </Link>
                 <Link 
                   href={`/my-playlists`}
-                  className="text-primary hover:text-primary/80"
+                  className="text-primary hover:text-primary/80 text-sm sm:text-base px-2 py-1 rounded-md hover:bg-primary/10 transition-colors"
                 >
-                  我的 TuneCard
+                  收藏
+                  <span className="hidden sm:inline"> TuneCard</span>
                 </Link>
               </>
             )}
           </nav>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center">
           {user ? (
             <Button
               variant="ghost"
               onClick={() => signOut()}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base px-2 sm:px-3"
+              size="sm"
             >
               <LogOut className="h-4 w-4" />
-              <span>登出</span>
+              <span className="hidden sm:inline">登出</span>
             </Button>
           ) : (
             <Link href="/login">
-              <Button variant="ghost">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-sm sm:text-base px-2 sm:px-3"
+              >
                 登入
               </Button>
             </Link>

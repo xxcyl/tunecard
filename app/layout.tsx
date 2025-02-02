@@ -11,8 +11,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'MusicHub - 創建和分享你的播放列表',
-  description: '一個簡單、直觀的音樂播放列表分享平台。搜索歌曲、創建播放列表，並與他人分享你的音樂品味。',
+  title: 'TuneCard - 分享你的音樂故事',
+  description: '創建精美的音樂卡片，分享你最愛的歌曲和播放列表。讓音樂連結彼此，訴說你的故事。',
 }
 
 export default function RootLayout({
