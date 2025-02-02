@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -188,7 +189,13 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
       if (tracksError) throw tracksError
 
       toast.success('播放列表已更新')
-      router.refresh()  // 重新驗證目前頁面的資料
+
+      // 重新驗證頁面
+      router.refresh()
+      
+      // 等待一下再導向，確保資料已更新
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
       router.push(`/playlists/${params.id}`)
     } catch (error) {
       console.error('Error updating playlist:', error)
@@ -229,7 +236,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold mb-4 text-gray-900">編輯 TuneCard</h1>
-          <p className="text-gray-600 mb-8">精選10首你最喜歡的歌曲，分享你的音樂故事。</p>
+          <p className="text-gray-600 mb-8">挑選你喜歡的歌曲，分享你的音樂故事。</p>
           
           <div className="space-y-4 mb-8">
             <Input

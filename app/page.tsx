@@ -43,7 +43,6 @@ async function getPlaylists() {
       return []
     }
 
-    console.log('Fetched playlists:', playlists)
     return playlists || []
   } catch (error) {
     console.error('Unexpected error:', error)
@@ -81,7 +80,7 @@ export default async function Home() {
         <section className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-4 text-gray-900">TuneCard</h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            精選10首你最喜歡的歌曲，與世界分享你的音樂故事。
+            挑選你喜愛的歌曲，與世界分享你的音樂故事。
           </p>
           <div className="space-y-4">
             {isLoggedIn ? (
@@ -111,13 +110,13 @@ export default async function Home() {
             {[
               {
                 icon: Music,
-                title: "智能搜尋",
-                description: "使用 Last.fm API 快速找到歌曲、專輯和歌手信息。",
+                title: "快速搜尋",
+                description: "使用 Last.fm API 快速找到歌曲、專輯和歌手資訊。",
               },
               {
                 icon: Share2,
                 title: "詳細資訊",
-                description: "查看歌曲的詳細信息，包括 Last.fm 介紹和 YouTube 官方影片。",
+                description: "查看歌曲的詳細資訊，包括 Last.fm 介紹和 YouTube 官方影片。",
               },
               {
                 icon: Headphones,

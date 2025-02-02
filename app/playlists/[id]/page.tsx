@@ -1,6 +1,3 @@
-// 確保頁面不會被快取
-export const dynamic = 'force-dynamic'
-
 import { cookies } from 'next/headers'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import Link from 'next/link'
@@ -11,6 +8,10 @@ import { Button } from '@/components/ui/button'
 import { formatDuration } from '@/utils/format'
 import DeletePlaylist from './delete-button'
 import { redirect } from 'next/navigation'
+
+// 確保頁面不會被快取
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 interface Track {
   id: string
@@ -58,7 +59,7 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   const { data: playlist, error: playlistError } = await supabase
     .from('playlists')
     .select(`

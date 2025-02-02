@@ -35,7 +35,6 @@ export async function middleware(request: NextRequest) {
   )
 
   try {
-    console.log('Middleware - Processing request:', request.nextUrl.pathname)
     const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
     if (sessionError) {
@@ -43,33 +42,18 @@ export async function middleware(request: NextRequest) {
       return response
     }
 
-    console.log('Middleware - Session status:', session ? 'Authenticated' : 'Not authenticated')
-
     // 如果用戶未登入且嘗試訪問受保護的路由
     if (!session && (
       request.nextUrl.pathname.startsWith('/create-playlist') ||
       request.nextUrl.pathname.startsWith('/my-playlists') ||
-      request.nextUrl.pathname.startsWith('/playlists') && (
-        request.nextUrl.pathname.endsWith('/edit') ||
-        request.method !== 'GET'
-      )
+      request.nextUrl.pathname.startsWith('/playlists') && request.nextUrl.pathname.endsWith('/edit')
     )) {
-      console.log('Middleware - Redirecting to login')
-      const redirectUrl = new URL('/login', request.url)
-      return NextResponse.redirect(redirectUrl)
+      return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // 如果用戶已登入且嘗試訪問登入頁面
-    if (session && request.nextUrl.pathname === '/login') {
-      console.log('Middleware - Redirecting to home')
-      const redirectUrl = new URL('/', request.url)
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    console.log('Middleware - Request processed successfully')
     return response
   } catch (error) {
-    console.error('Middleware - Unexpected error:', error)
+    console.error('Middleware - Error:', error)
     return response
   }
 }
@@ -79,6 +63,5 @@ export const config = {
     '/create-playlist',
     '/my-playlists',
     '/playlists/:path*/edit',
-    '/login',
   ],
 }
