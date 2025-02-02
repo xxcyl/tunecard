@@ -29,6 +29,7 @@ interface SearchResult {
   duration?: number | null
   image: string | null
   lastfm_link?: string
+  youtube_link?: string
 }
 
 export default function CreatePlaylist() {
