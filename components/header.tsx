@@ -51,6 +51,12 @@ export function Header() {
             <span className="text-xl font-bold hidden sm:inline">TuneCard</span>
           </Link>
           <nav className="flex items-center space-x-2 sm:space-x-4">
+            <Link 
+              href="/playlists" 
+              className="text-primary hover:text-primary/80 text-sm sm:text-base px-2 py-1 rounded-md hover:bg-primary/10 transition-colors"
+            >
+              列表
+            </Link>
             {user && (
               <>
                 <Link 
@@ -58,14 +64,12 @@ export function Header() {
                   className="text-primary hover:text-primary/80 text-sm sm:text-base px-2 py-1 rounded-md hover:bg-primary/10 transition-colors"
                 >
                   建立
-                  <span className="hidden sm:inline"> TuneCard</span>
                 </Link>
                 <Link 
                   href={`/my-playlists`}
                   className="text-primary hover:text-primary/80 text-sm sm:text-base px-2 py-1 rounded-md hover:bg-primary/10 transition-colors"
                 >
-                  收藏
-                  <span className="hidden sm:inline"> TuneCard</span>
+                  我的
                 </Link>
               </>
             )}

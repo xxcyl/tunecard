@@ -4,7 +4,8 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { Header } from "../components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Music, Share2, Headphones, Plus, Youtube, ExternalLink } from "lucide-react"
+import { Music, Share2, Headphones, Plus } from "lucide-react"
+import { LatestPlaylists } from "@/components/latest-playlists"
 
 async function getPlaylists() {
   try {
@@ -35,7 +36,7 @@ async function getPlaylists() {
         playlist_tracks (*)
       `)
       .order('created_at', { ascending: false })
-      .limit(10)
+      .limit(9)
 
     if (playlistError) {
       console.error('Error fetching playlists:', playlistError)
@@ -141,49 +142,7 @@ export default async function Home() {
 
         <section className="max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold mb-6 text-gray-900">最新播放列表</h2>
-          {(!playlists || playlists.length === 0) ? (
-            <div className="text-center py-12">
-              <Music className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">還沒有任何播放列表</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {playlists.map((playlist) => (
-                <Link 
-                  key={playlist.id}
-                  href={`/playlists/${playlist.id}`}
-                  className="block group"
-                >
-                  <Card className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1">
-                    <CardContent className="p-6 bg-gradient-to-br from-white to-purple-50">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold truncate flex-1">
-                          {playlist.name}
-                        </h3>
-                        <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-full">
-                          <Music className="w-4 h-4 text-purple-600" />
-                        </div>
-                      </div>
-                      {playlist.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-                          {playlist.description}
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Headphones className="w-4 h-4" />
-                          {playlist.playlist_tracks?.length || 0} 首歌曲
-                        </span>
-                        <span>
-                          by {playlist.profiles.username || '匿名用戶'}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
+          <LatestPlaylists playlists={playlists} />
         </section>
       </main>
     </div>

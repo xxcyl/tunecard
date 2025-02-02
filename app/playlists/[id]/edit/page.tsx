@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Trash2, GripVertical, Music2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { DragDropContext, Droppable, Draggable, OnDragEndResponder, DropResult } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable, OnDragEndResponder, DropResult, DroppableProvided, DraggableProvided } from '@hello-pangea/dnd'
 
 interface Track {
   id: string
@@ -37,6 +37,7 @@ interface SearchResult {
 interface Playlist {
   id: string
   name: string
+  description?: string
   user_id: string
   playlist_tracks: Track[]
 }
@@ -44,6 +45,7 @@ interface Playlist {
 export default function EditPlaylist({ params }: { params: { id: string } }) {
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [playlistName, setPlaylistName] = useState('')
+  const [description, setDescription] = useState('')
   const [tracks, setTracks] = useState<Track[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -78,6 +80,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
 
       setPlaylist(playlist)
       setPlaylistName(playlist.name)
+      setDescription(playlist.description || '')
       setTracks(playlist.playlist_tracks.sort((a: Track, b: Track) => a.position - b.position))
     } catch (error) {
       console.error('Error fetching playlist:', error)
@@ -146,10 +149,13 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
     try {
       setSaving(true)
 
-      // 更新播放列表名稱
+      // 更新播放列表名稱和簡介
       const { error: nameError } = await supabase
         .from('playlists')
-        .update({ name: playlistName.trim() })
+        .update({
+          name: playlistName.trim(),
+          description: description.trim()
+        })
         .eq('id', params.id)
 
       if (nameError) throw nameError
@@ -225,7 +231,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
           <h1 className="text-4xl font-bold mb-4 text-gray-900">編輯 TuneCard</h1>
           <p className="text-gray-600 mb-8">精選10首你最喜歡的歌曲，分享你的音樂故事。</p>
           
-          <div className="mb-8">
+          <div className="space-y-4 mb-8">
             <Input
               type="text"
               placeholder="播放列表名稱"
@@ -233,11 +239,17 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
               onChange={(e) => setPlaylistName(e.target.value)}
               className="text-xl"
             />
+            <Input
+              type="text"
+              placeholder="簡介"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </div>
 
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="tracks">
-              {(provided) => (
+              {(provided: DroppableProvided) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
@@ -249,7 +261,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
                       draggableId={track.id || index.toString()}
                       index={index}
                     >
-                      {(provided) => (
+                      {(provided: DraggableProvided) => (
                         <Card
                           ref={provided.innerRef}
                           {...provided.draggableProps}
