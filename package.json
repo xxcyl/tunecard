@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "vercel-build": "npm install --legacy-peer-deps && next build"
+    "vercel-build": "npm install --legacy-peer-deps && npm install tailwindcss postcss autoprefixer && next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -59,7 +59,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
-    "tailwindcss": "latest"
+    "tailwindcss": "^3.4.17"
   },
   "devDependencies": {
     "@types/node": "^22",
