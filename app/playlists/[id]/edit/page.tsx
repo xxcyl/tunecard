@@ -311,7 +311,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
                           {track.image ? (
                             <img
                               src={track.image}
-                              alt={track.name}
+                              alt={track.title}
                               className="w-12 h-12 object-cover rounded mr-4"
                             />
                           ) : (
