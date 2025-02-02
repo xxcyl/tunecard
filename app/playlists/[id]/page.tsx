@@ -117,7 +117,7 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
           <div className="space-y-4">
             {playlist.playlist_tracks
               .sort((a: Track, b: Track) => a.position - b.position)
-              .map((track) => (
+              .map((track: Track) => (
                 <Card key={track.id}>
                   <CardContent className="flex items-center p-4">
                     {track.image ? (
