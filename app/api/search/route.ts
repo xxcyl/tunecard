@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 
 const LASTFM_API_KEY = process.env.LASTFM_API_KEY || '3566d6ff56588bed0523e0f83482ffc3'
 const LASTFM_API_URL = 'http://ws.audioscrobbler.com/2.0/'
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -35,58 +34,63 @@ export async function GET(request: Request) {
         const infoResponse = await fetch(infoUrl)
         const infoData = await infoResponse.json()
 
-        // 設置 YouTube 連結
-        let youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.name} ${track.artist} official music video`)}`
+        // 處理圖片：優先使用專輯圖片，如果沒有則使用歌曲圖片
+        const albumImage = infoData.track?.album?.image?.[2]?.['#text']
+        const trackImage = track.image?.[2]?.['#text']
+        
+        // 確保我們有 Last.fm URL
+        const lastfmUrl = track.url || null
+        console.log('Track info:', {
+          name: track.name,
+          lastfm_link: lastfmUrl,
+          track_url: track.url,
+          info_url: infoData.track?.url
+        })
 
-        // 如果有 YouTube API Key，嘗試找到精確的影片
-        if (YOUTUBE_API_KEY) {
-          try {
-            const youtubeSearchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&maxResults=1&q=${encodeURIComponent(`${track.name} ${track.artist} official music video`)}&key=${YOUTUBE_API_KEY}`
-            const youtubeResponse = await fetch(youtubeSearchUrl)
-            const youtubeData = await youtubeResponse.json()
-
-            if (youtubeData.items?.[0]?.id?.videoId) {
-              youtubeLink = `https://www.youtube.com/watch?v=${youtubeData.items[0].id.videoId}`
-            }
-          } catch (error) {
-            console.error('YouTube API Error:', error)
-            // 繼續使用搜索連結
-          }
-        }
+        // 創建 YouTube 搜尋連結
+        const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.name} ${track.artist}`)}`
 
         return {
           id: track.mbid || `${track.name}-${track.artist}`,
           title: track.name,
           artist: track.artist,
-          album: infoData.track?.album?.title || '',
-          image: infoData.track?.album?.image?.[3]?.['#text'] || track.image?.[2]?.['#text'] || null,
-          youtube_link: youtubeLink,
-          lastfm_link: infoData.track?.url || `https://www.last.fm/music/${encodeURIComponent(track.artist)}/_/${encodeURIComponent(track.name)}`,
-          duration: infoData.track?.duration ? Math.round(Number(infoData.track.duration) / 1000) : null
+          duration: infoData.track?.duration ? Math.floor(parseInt(infoData.track.duration) / 1000) : null,
+          album: infoData.track?.album?.title || null,
+          image: albumImage || trackImage || null,
+          lastfm_link: lastfmUrl,
+          youtube_link: youtubeSearchUrl
         }
       } catch (error) {
-        console.error('Error getting track details:', error)
+        console.error('Error fetching track info:', error)
         // 如果獲取詳細信息失敗，返回基本信息
+        // 如果獲取詳細信息失敗，返回基本信息
+        const lastfmUrl = track.url || null
+        console.log('Track basic info:', {
+          name: track.name,
+          lastfm_link: lastfmUrl,
+          track_url: track.url
+        })
+
+        // 創建 YouTube 搜尋連結
+        const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.name} ${track.artist}`)}`
+
         return {
-          id: `${track.name}-${track.artist}`,
+          id: track.mbid || `${track.name}-${track.artist}`,
           title: track.name,
           artist: track.artist,
-          album: '',
           image: track.image?.[2]?.['#text'] || null,
-          youtube_link: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.name} ${track.artist} official music video`)}`,
-          lastfm_link: `https://www.last.fm/music/${encodeURIComponent(track.artist)}/_/${encodeURIComponent(track.name)}`,
-          duration: null
+          lastfm_link: lastfmUrl,
+          youtube_link: youtubeSearchUrl
         }
       }
     })
 
-    const formattedTracks = await Promise.all(trackDetailsPromises)
-    return NextResponse.json(formattedTracks)
-
-  } catch (error: any) {
+    const trackDetails = await Promise.all(trackDetailsPromises)
+    return NextResponse.json(trackDetails)
+  } catch (error) {
     console.error('Error searching tracks:', error)
     return NextResponse.json(
-      { error: 'Failed to search tracks', details: error.message },
+      { error: 'Failed to search tracks', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

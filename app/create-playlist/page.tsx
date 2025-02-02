@@ -14,10 +14,10 @@ interface Track {
   id: string
   title: string
   artist: string
-  album?: string
+  album?: string | null
   duration?: number | null
-  youtube_link?: string
-  lastfm_link?: string
+  youtube_link?: string | null
+  lastfm_link?: string | null
   image?: string | null
 }
 
@@ -28,7 +28,6 @@ interface SearchResult {
   album?: string
   duration?: number | null
   image: string | null
-  youtube_link?: string
   lastfm_link?: string
 }
 
@@ -53,6 +52,8 @@ export default function CreatePlaylist() {
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
       const data = await response.json()
+      console.log('Search results:', data)  // 檢查搜索結果
+      console.log('First track lastfm_url:', data[0]?.lastfm_url)  // 檢查第一首歌曲的 Last.fm URL
       setSearchResults(data)
     } catch (error) {
       console.error('Error searching tracks:', error)
@@ -70,24 +71,69 @@ export default function CreatePlaylist() {
     }
   }, [debouncedSearch])
 
-  const addTrack = (track: SearchResult) => {
+  const addTrack = async (track: SearchResult) => {
     if (tracks.length >= 10) {
       toast.error('最多只能新增 10 首歌曲')
       return
     }
-    const newTrack: Track = {
-      id: `temp-${Date.now()}`,
-      title: track.title,
-      artist: track.artist,
-      album: track.album,
-      duration: track.duration,
-      image: track.image,
-      youtube_link: track.youtube_link,
-      lastfm_link: track.lastfm_link
+
+    try {
+      // 先嘗試獲取 YouTube 影片連結，如果失敗則使用搜尋連結
+      let youtubeLink = track.youtube_link || null  // 預設使用搜尋連結
+      try {
+        const youtubeResponse = await fetch(
+          `/api/youtube?q=${encodeURIComponent(`${track.title} ${track.artist}`)}`
+        )
+        const youtubeData = await youtubeResponse.json()
+        if (youtubeResponse.ok && youtubeData.url) {
+          youtubeLink = youtubeData.url  // 如果成功獲取影片連結，則替換搜尋連結
+        }
+      } catch (error) {
+        console.error('Error fetching YouTube link:', error)
+        // 使用預設的搜尋連結
+      }
+
+      // 確保所有必要的屬性都被正確設置
+      console.log('Track data before conversion:', {
+        ...track,
+        lastfm_link: track.lastfm_link
+      })  // 檢查轉換前的數據
+      console.log('YouTube link:', youtubeLink)  // 檢查 YouTube 連結
+
+      const newTrack: Track = {
+        id: `temp-${Date.now()}`,
+        title: track.title,
+        artist: track.artist,
+        album: track.album || null,
+        duration: track.duration || null,
+        image: track.image || null,
+        youtube_link: youtubeLink,
+        lastfm_link: track.lastfm_link || null
+      }
+
+      console.log('New track after conversion:', {
+        ...newTrack,
+        has_youtube: typeof newTrack.youtube_link === 'string' && newTrack.youtube_link.length > 0,
+        has_lastfm: typeof newTrack.lastfm_link === 'string' && newTrack.lastfm_link.length > 0,
+        youtube_link: newTrack.youtube_link,
+        lastfm_link: newTrack.lastfm_link
+      })  // 檢查轉換後的數據
+
+      // 檢查是否成功獲取所有連結
+      console.log('Adding new track:', {
+        ...newTrack,
+        has_youtube: !!newTrack.youtube_link,
+        has_lastfm: !!newTrack.lastfm_link
+      })
+
+      setTracks([...tracks, newTrack])
+      setSearchQuery('')
+      setSearchResults([])
+      toast.success('已新增歌曲')
+    } catch (error) {
+      console.error('Error fetching YouTube link:', error)
+      toast.error('無法獲取 YouTube 連結')
     }
-    setTracks([...tracks, newTrack])
-    setSearchQuery('')
-    setSearchResults([])
   }
 
   const removeTrack = (id: string) => {
@@ -115,16 +161,23 @@ export default function CreatePlaylist() {
         body: JSON.stringify({
           name: playlistName.trim(),
           description: description.trim(),
-          tracks: tracks.map((track, index) => ({
-            title: track.title,
-            artist: track.artist,
-            album: track.album,
-            duration: track.duration,
-            image: track.image,
-            youtube_link: track.youtube_link || null,
-            lastfm_link: track.lastfm_link || null,
-            position: index + 1,
-          })),
+          tracks: tracks.map((track, index) => {
+            // 確保所有屬性都正確設置
+            const mappedTrack = {
+              title: track.title,
+              artist: track.artist,
+              album: track.album || null,
+              duration: track.duration || null,
+              image: track.image || null,
+              youtube_link: track.youtube_link || null,
+              lastfm_link: track.lastfm_link || null,
+              position: index + 1,
+              has_youtube: typeof track.youtube_link === 'string' && track.youtube_link.length > 0,
+              has_lastfm: typeof track.lastfm_link === 'string' && track.lastfm_link.length > 0
+            }
+            console.log(`Track ${index + 1} being saved:`, mappedTrack)
+            return mappedTrack
+          }),
         }),
       })
 
@@ -195,6 +248,30 @@ export default function CreatePlaylist() {
                             <div className="text-sm text-gray-500 truncate">
                               {track.artist}
                               {track.album && ` • ${track.album}`}
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              {track.youtube_link && (
+                                <a
+                                  href={track.youtube_link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-red-500 hover:text-red-600"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  YouTube
+                                </a>
+                              )}
+                              {track.lastfm_link && (
+                                <a
+                                  href={track.lastfm_link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:text-blue-600"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  Last.fm
+                                </a>
+                              )}
                             </div>
                           </div>
                         </div>

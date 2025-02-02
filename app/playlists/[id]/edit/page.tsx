@@ -19,7 +19,7 @@ interface Track {
   duration?: number | null
   image?: string | null
   youtube_link?: string
-  lastfm_link?: string
+  lastfm_link?: string | null
   position: number
 }
 
@@ -31,7 +31,7 @@ interface SearchResult {
   duration?: number | null
   image: string | null
   youtube_link?: string
-  lastfm_link?: string
+  lastfm_link?: string | null
 }
 
 interface Playlist {
@@ -120,11 +120,11 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
       id: `temp-${Date.now()}`,
       title: track.title,
       artist: track.artist,
-      album: track.album,
-      duration: track.duration,
-      image: track.image,
-      youtube_link: track.youtube_link,
-      lastfm_link: track.lastfm_link,
+      album: track.album || null,
+      duration: track.duration || null,
+      image: track.image || null,
+      youtube_link: track.youtube_link || null,
+      lastfm_link: track.lastfm_link || null,
       position: tracks.length + 1
     }
     setTracks([...tracks, newTrack])
@@ -170,11 +170,11 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
             playlist_id: params.id,
             title: track.title,
             artist: track.artist,
-            album: track.album,
-            duration: track.duration,
-            image: track.image,
-            youtube_link: track.youtube_link,
-            lastfm_link: track.lastfm_link,
+            album: track.album || null,
+            duration: track.duration || null,
+            image: track.image || null,
+            youtube_link: track.youtube_link || null,
+            lastfm_link: track.lastfm_link || null,
             position: index + 1
           }))
         )
@@ -265,6 +265,30 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
                               <div className="text-sm text-gray-500">
                                 {track.artist}
                                 {track.album && ` • ${track.album}`}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                {track.youtube_link && (
+                                  <a
+                                    href={track.youtube_link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-red-500 hover:text-red-600"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    YouTube
+                                  </a>
+                                )}
+                                {track.lastfm_link && (
+                                  <a
+                                    href={track.lastfm_link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:text-blue-600"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    Last.fm
+                                  </a>
+                                )}
                               </div>
                             </div>
                             <Button

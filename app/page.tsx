@@ -32,7 +32,7 @@ async function getPlaylists() {
       .select(`
         *,
         profiles:user_id(username, avatar_url),
-        playlist_tracks(count)
+        playlist_tracks (*)
       `)
       .order('created_at', { ascending: false })
       .limit(10)
@@ -172,7 +172,7 @@ export default async function Home() {
                       <div className="flex items-center justify-between text-sm text-gray-500">
                         <span className="flex items-center gap-1">
                           <Headphones className="w-4 h-4" />
-                          {playlist.playlist_tracks.length} 首歌曲
+                          {playlist.playlist_tracks?.length || 0} 首歌曲
                         </span>
                         <span>
                           by {playlist.profiles.username || '匿名用戶'}

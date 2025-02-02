@@ -13,11 +13,11 @@ interface Track {
   id: string
   title: string
   artist: string
-  album: string
-  duration: number
-  image: string
-  youtube_link: string
-  lastfm_link: string
+  album: string | null
+  duration: number | null
+  image: string | null
+  youtube_link: string | null
+  lastfm_link: string | null
   position: number
 }
 
@@ -155,7 +155,7 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
                           href={track.lastfm_link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-500 hover:text-red-500 transition-colors"
+                          className="text-gray-500 hover:text-blue-500 transition-colors"
                         >
                           <ExternalLink className="w-5 h-5" />
                         </a>
