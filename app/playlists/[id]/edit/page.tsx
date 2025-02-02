@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Trash2, GripVertical, Music2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable, OnDragEndResponder, DropResult } from '@hello-pangea/dnd'
 
 interface Track {
   id: string
@@ -195,7 +195,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
     setTracks(tracks.filter((_, i) => i !== index))
   }
 
-  const onDragEnd = (result: { destination?: { index: number }, source: { index: number } }) => {
+  const onDragEnd: OnDragEndResponder = (result: DropResult) => {
     if (!result.destination) return
 
     const items = Array.from(tracks)
