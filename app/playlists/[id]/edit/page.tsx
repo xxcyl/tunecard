@@ -78,7 +78,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
 
       setPlaylist(playlist)
       setPlaylistName(playlist.name)
-      setTracks(playlist.playlist_tracks.sort((a, b) => a.position - b.position))
+      setTracks(playlist.playlist_tracks.sort((a: Track, b: Track) => a.position - b.position))
     } catch (error) {
       console.error('Error fetching playlist:', error)
       toast.error('無法載入播放列表')
