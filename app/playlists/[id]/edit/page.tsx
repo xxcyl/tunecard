@@ -182,6 +182,7 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
       if (tracksError) throw tracksError
 
       toast.success('播放列表已更新')
+      router.refresh()  // 重新驗證目前頁面的資料
       router.push(`/playlists/${params.id}`)
     } catch (error) {
       console.error('Error updating playlist:', error)

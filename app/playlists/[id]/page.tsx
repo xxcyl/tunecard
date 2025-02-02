@@ -1,3 +1,6 @@
+// 確保頁面不會被快取
+export const dynamic = 'force-dynamic'
+
 import { cookies } from 'next/headers'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import Link from 'next/link'
