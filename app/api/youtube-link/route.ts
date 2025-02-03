@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const youtubeSearchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&maxResults=1&q=${encodeURIComponent(`${title} ${artist} official music video`)}&key=${YOUTUBE_API_KEY}`
+    const youtubeSearchUrl = `https://www.googleapis.com/youtube/v3/search?part=id&type=video&videoCategoryId=10&maxResults=1&q=${encodeURIComponent(`${title} ${artist} official music video`)}&key=${YOUTUBE_API_KEY}`
     const youtubeResponse = await fetch(youtubeSearchUrl)
     const youtubeData = await youtubeResponse.json()
 

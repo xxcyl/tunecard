@@ -79,15 +79,16 @@ export default function CreatePlaylist() {
     }
 
     try {
-      // 先嘗試獲取 YouTube 影片連結，如果失敗則使用搜尋連結
-      let youtubeLink = track.youtube_link || null  // 預設使用搜尋連結
+      // 當選擇歌曲時，呼叫 youtube-link API 獲取影片連結
+      let youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.title} ${track.artist} official music video`)}`
+      
       try {
-        const youtubeResponse = await fetch(
-          `/api/youtube?q=${encodeURIComponent(`${track.title} ${track.artist}`)}`
+        const response = await fetch(
+          `/api/youtube-link?title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.artist)}`
         )
-        const youtubeData = await youtubeResponse.json()
-        if (youtubeResponse.ok && youtubeData.url) {
-          youtubeLink = youtubeData.url  // 如果成功獲取影片連結，則替換搜尋連結
+        const data = await response.json()
+        if (data.url) {
+          youtubeLink = data.url
         }
       } catch (error) {
         console.error('Error fetching YouTube link:', error)

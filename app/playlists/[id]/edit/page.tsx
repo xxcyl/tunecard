@@ -115,11 +115,27 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
     }
   }
 
-  const addTrack = (track: SearchResult) => {
+  const addTrack = async (track: SearchResult) => {
     if (tracks.length >= 10) {
       toast.error('最多只能新增 10 首歌曲')
       return
     }
+
+    // 當選擇歌曲時，呼叫 youtube-link API 獲取影片連結
+    let youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.title} ${track.artist} official music video`)}`
+    try {
+      const response = await fetch(
+        `/api/youtube-link?title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.artist)}`
+      )
+      const data = await response.json()
+      if (data.url) {
+        youtubeLink = data.url
+      }
+    } catch (error) {
+      console.error('Error fetching YouTube link:', error)
+      // 使用預設的搜尋連結
+    }
+
     const newTrack: Track = {
       id: `temp-${Date.now()}`,
       title: track.title,
@@ -127,10 +143,11 @@ export default function EditPlaylist({ params }: { params: { id: string } }) {
       album: track.album || null,
       duration: track.duration || null,
       image: track.image || null,
-      youtube_link: track.youtube_link || null,
+      youtube_link: youtubeLink,
       lastfm_link: track.lastfm_link || null,
       position: tracks.length + 1
     }
+
     setTracks([...tracks, newTrack])
     setSearchQuery('')
     setSearchResults([])

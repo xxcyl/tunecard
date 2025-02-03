@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-const LASTFM_API_KEY = process.env.LASTFM_API_KEY || '3566d6ff56588bed0523e0f83482ffc3'
+const LASTFM_API_KEY = process.env.LASTFM_API_KEY
 const LASTFM_API_URL = 'http://ws.audioscrobbler.com/2.0/'
 
 export async function GET(request: Request) {
@@ -47,9 +47,6 @@ export async function GET(request: Request) {
           info_url: infoData.track?.url
         })
 
-        // 創建 YouTube 搜尋連結
-        const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.name} ${track.artist}`)}`
-
         return {
           id: track.mbid || `${track.name}-${track.artist}`,
           title: track.name,
@@ -57,8 +54,7 @@ export async function GET(request: Request) {
           duration: infoData.track?.duration ? Math.floor(parseInt(infoData.track.duration) / 1000) : null,
           album: infoData.track?.album?.title || null,
           image: albumImage || trackImage || null,
-          lastfm_link: lastfmUrl,
-          youtube_link: youtubeSearchUrl
+          lastfm_link: lastfmUrl
         }
       } catch (error) {
         console.error('Error fetching track info:', error)
@@ -71,16 +67,12 @@ export async function GET(request: Request) {
           track_url: track.url
         })
 
-        // 創建 YouTube 搜尋連結
-        const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.name} ${track.artist}`)}`
-
         return {
           id: track.mbid || `${track.name}-${track.artist}`,
           title: track.name,
           artist: track.artist,
           image: track.image?.[2]?.['#text'] || null,
-          lastfm_link: lastfmUrl,
-          youtube_link: youtubeSearchUrl
+          lastfm_link: lastfmUrl
         }
       }
     })
