@@ -96,7 +96,7 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
             <div className="w-full md:w-80 bg-gradient-to-br from-purple-100/50 to-purple-200/50 p-6">
               <div className="relative w-48 aspect-square mx-auto rounded-xl overflow-hidden shadow-lg">
                 <div className="absolute inset-0 grid grid-cols-2 gap-0.5 p-0.5 bg-gradient-to-br from-purple-200 to-purple-300">
-                  {playlist.playlist_tracks.slice(0, 4).map((track, index) => (
+                  {playlist.playlist_tracks.slice(0, 4).map((track: Track, index: number) => (
                     <div key={track.id} className="relative overflow-hidden rounded-sm bg-purple-100">
                       {track.image ? (
                         <img
