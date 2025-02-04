@@ -24,8 +24,8 @@ export function LatestPlaylists({ playlists }: { playlists: Playlist[] }) {
   // 初始化重複的播放列表
   useEffect(() => {
     if (!playlists || playlists.length === 0) return
-    // 在列表末尾添加前三個項目以實現無縫循環
-    setDuplicatedPlaylists([...playlists, ...playlists.slice(0, 3)])
+    // 在列表末尾添加一整組列表來實現無縫循環
+    setDuplicatedPlaylists([...playlists, ...playlists])
   }, [playlists])
 
   useEffect(() => {
@@ -36,24 +36,17 @@ export function LatestPlaylists({ playlists }: { playlists: Playlist[] }) {
       scrollInterval.current = setInterval(() => {
         if (scrollRef.current && !isScrolling) {
           const container = scrollRef.current
-          const isNearEnd = container.scrollLeft + container.offsetWidth >= container.scrollWidth - 600
+          const totalWidth = container.scrollWidth / 2
+          const currentPosition = container.scrollLeft
+          const viewportWidth = container.offsetWidth
 
-          if (isNearEnd) {
-            // 當接近末尾時，先停止動畫
-            setIsScrolling(true)
-            // 等待一小段時間後重置位置
-            setTimeout(() => {
-              container.style.scrollBehavior = 'auto'
-              container.scrollLeft = 0
-              // 重置後恢復平滑滾動
-              setTimeout(() => {
-                container.style.scrollBehavior = 'smooth'
-                setIsScrolling(false)
-              }, 50)
-            }, 300)
-          } else {
-            container.scrollLeft += 300
+          // 當滾動到第二組的開始位置時
+          if (currentPosition >= totalWidth) {
+            container.scrollLeft = 0
+            container.scrollLeft += currentPosition - totalWidth
           }
+
+          container.scrollLeft += 300
         }
       }, 5000)
     }
@@ -81,23 +74,21 @@ export function LatestPlaylists({ playlists }: { playlists: Playlist[] }) {
       const container = scrollRef.current
       const scrollAmount = direction === 'left' ? -300 : 300
       
-      if (direction === 'left' && container.scrollLeft === 0) {
-        // 如果向左滾動且已在開頭，跳到末尾
-        container.style.scrollBehavior = 'auto'
-        container.scrollLeft = container.scrollWidth - container.offsetWidth - 600
-        setTimeout(() => {
-          container.style.scrollBehavior = 'smooth'
-          container.scrollLeft -= 300
-        }, 50)
-      } else if (direction === 'right' && container.scrollLeft + container.offsetWidth >= container.scrollWidth - 300) {
-        // 如果向右滾動且接近末尾，跳回開頭
-        container.style.scrollBehavior = 'auto'
-        container.scrollLeft = 0
-        setTimeout(() => {
-          container.style.scrollBehavior = 'smooth'
-          container.scrollLeft += 300
-        }, 50)
+      const totalWidth = container.scrollWidth / 2
+      const currentPosition = container.scrollLeft
+
+      if (direction === 'left') {
+        if (currentPosition <= 0) {
+          // 如果在最開始，跳到第二組的對應位置
+          container.scrollLeft = totalWidth
+        }
+        container.scrollLeft += scrollAmount
       } else {
+        if (currentPosition >= totalWidth) {
+          // 如果在第二組，跳回第一組的對應位置
+          container.scrollLeft = 0
+          container.scrollLeft += currentPosition - totalWidth
+        }
         container.scrollLeft += scrollAmount
       }
     }
@@ -154,18 +145,19 @@ export function LatestPlaylists({ playlists }: { playlists: Playlist[] }) {
       </button>
       <div 
         ref={scrollRef}
-        className="overflow-x-auto scrollbar-hide flex space-x-6 px-8 pb-4 snap-x snap-mandatory touch-pan-x scroll-smooth"
+        className="overflow-x-auto scrollbar-hide flex space-x-8 px-8 pb-4 snap-x snap-mandatory touch-pan-x scroll-smooth"
+        style={{ scrollSnapAlign: 'center' }}
       >
         {duplicatedPlaylists.map((playlist) => (
-          <div key={playlist.id} className="flex-none w-[300px] snap-start">
+          <div key={playlist.id} className="flex-none w-[300px] snap-center">
             <Link 
               href={`/playlists/${playlist.id}`}
               className="block group"
             >
-              <Card className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 h-[180px] bg-white/80 backdrop-blur-sm">
+              <Card className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 h-[180px] bg-white/90 backdrop-blur-sm">
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-purple-100">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-purple-100 to-purple-50 ring-2 ring-purple-100">
                       {playlist.playlist_tracks[0]?.image ? (
                         <img 
                           src={playlist.playlist_tracks[0].image} 
@@ -178,20 +170,20 @@ export function LatestPlaylists({ playlists }: { playlists: Playlist[] }) {
                         </div>
                       )}
                     </div>
-                    <h3 className="text-lg font-semibold truncate flex-1">
+                    <h3 className="text-lg font-semibold truncate flex-1 text-gray-800">
                       {playlist.name}
                     </h3>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-                      {playlist.description || '暫無簡介'}
-                    </p>
+                    <blockquote className="text-sm text-gray-600 border-l-2 border-purple-300 pl-3 italic line-clamp-2 mb-4">
+                      {playlist.description || '暂無簡介'}
+                    </blockquote>
                   </div>
                   <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded-full text-purple-700">
                       {playlist.playlist_tracks?.length || 0} 首歌曲
                     </span>
-                    <span>
+                    <span className="font-medium">
                       by {playlist.profiles.username || '匿名用戶'}
                     </span>
                   </div>

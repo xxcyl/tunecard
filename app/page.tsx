@@ -74,11 +74,11 @@ export default async function Home() {
   const isLoggedIn = !!user
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
-      <main>
+      <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-20 pb-8 sm:pt-32 sm:pb-12 bg-gradient-to-b from-purple-100/50 via-purple-50/20 to-white">
+        <section className="relative overflow-hidden pt-16 pb-8 sm:pt-24 sm:pb-12 bg-gradient-to-b from-purple-100/50 via-purple-50/20 to-white">
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
           </div>
@@ -87,10 +87,10 @@ export default async function Home() {
               <h1 className="text-4xl sm:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-purple-400">
                 TuneCard
               </h1>
-              <p className="text-xl sm:text-2xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
                 挑選你喜愛的歌曲，與世界分享你的音樂故事。
               </p>
-              <div className="space-y-4 mb-16">
+              <div className="space-y-4 mb-12">
                 {isLoggedIn ? (
                   <Button 
                     asChild 
@@ -121,52 +121,36 @@ export default async function Home() {
               </div>
             </div>
           </div>
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-gradient-to-br from-purple-50/30 to-white/30 rounded-3xl py-8">
-                <LatestPlaylists playlists={playlists} />
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Features Section */}
-        <section className="py-12 bg-gradient-to-b from-white to-purple-50">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 mb-16">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">功能介紹</h2>
-              <p className="text-gray-600 mb-8">使用以下功能，創建你的音樂名片</p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
                   {
                     icon: Music,
                     title: "快速搜尋",
                     description: "使用 Last.fm API 快速找到歌曲、專輯和歌手資訊。",
-                    gradient: "from-purple-500 to-purple-600",
                   },
                   {
                     icon: Share2,
                     title: "詳細資訊",
                     description: "查看歌曲的詳細資訊，包括 Last.fm 介紹和 YouTube 官方影片。",
-                    gradient: "from-purple-400 to-purple-500",
                   },
                   {
                     icon: Headphones,
                     title: "直接連結",
                     description: "一鍵快速跳轉到 YouTube 觀看音樂影片或 Last.fm 查看更多資訊。",
-                    gradient: "from-purple-300 to-purple-400",
                   },
                 ].map((feature, index) => (
                   <Card 
                     key={index} 
-                    className="group border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden relative"
+                    className="group bg-white/50 border border-purple-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 overflow-hidden relative"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
                     <CardHeader>
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center mb-4">
                         <feature.icon className="w-6 h-6 text-purple-600" />
                       </div>
-                      <CardTitle className="text-xl font-bold text-gray-900">
+                      <CardTitle className="text-lg font-semibold text-gray-900">
                         {feature.title}
                       </CardTitle>
                     </CardHeader>
@@ -175,6 +159,14 @@ export default async function Home() {
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="bg-gradient-to-br from-purple-100/90 to-purple-50/90 backdrop-blur-sm shadow-xl rounded-3xl py-8 border border-purple-200/50">
+                <LatestPlaylists playlists={playlists} />
               </div>
             </div>
           </div>
