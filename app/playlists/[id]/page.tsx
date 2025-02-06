@@ -1,17 +1,15 @@
-import { cookies } from 'next/headers'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+"use client"
+
 import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Card, CardContent } from '@/components/ui/card'
-import { Youtube, Music2, ExternalLink, Pencil, Trash2 } from 'lucide-react'
+import { Youtube, Music2, ExternalLink, Pencil, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { formatDuration } from '@/utils/format'
 import DeletePlaylist from './delete-button'
-import { redirect } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-// 確保頁面不會被快取
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
 
 interface Track {
   id: string
@@ -21,6 +19,7 @@ interface Track {
   duration: number | null
   image: string | null
   youtube_link: string | null
+  embedUrl?: string | null
   lastfm_link: string | null
   position: number
 }
@@ -38,41 +37,64 @@ interface Playlist {
   }
 }
 
-export default async function PlaylistPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options })
-        },
-      },
+export default function PlaylistPage({ params }: { params: { id: string } }) {
+  const [currentVideo, setCurrentVideo] = useState<Track | null>(null)
+
+  const [playlist, setPlaylist] = useState<Playlist | null>(null)
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const supabase = createClientComponentClient()
+        
+        // 獲取用戶資訊
+        const { data: { user } } = await supabase.auth.getUser()
+        setUser(user)
+
+        // 獲取播放列表資訊
+        const { data: playlist, error: playlistError } = await supabase
+          .from('playlists')
+          .select(`
+            *,
+            profiles (username, avatar_url),
+            playlist_tracks (*)
+          `)
+          .eq('id', params.id)
+          .single()
+
+        if (playlistError) {
+          console.error('Error fetching playlist:', playlistError)
+          window.location.href = '/'
+          return
+        }
+
+        setPlaylist(playlist)
+      } catch (error) {
+        console.error('Error:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-  )
 
-  const { data: { user } } = await supabase.auth.getUser()
+    fetchData()
+  }, [params.id])
 
-  const { data: playlist, error: playlistError } = await supabase
-    .from('playlists')
-    .select(`
-      *,
-      profiles (username, avatar_url),
-      playlist_tracks (*)
-    `)
-    .eq('id', params.id)
-    .single()
-
-  if (playlistError) {
-    console.error('Error fetching playlist:', playlistError)
-    redirect('/')
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-64 bg-purple-100 rounded-lg mb-4"></div>
+            <div className="h-8 bg-purple-100 rounded w-1/3 mb-2"></div>
+            <div className="h-4 bg-purple-100 rounded w-1/4"></div>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   if (!playlist) {
@@ -204,15 +226,13 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
                       </div>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         {track.youtube_link && (
-                          <a
-                            href={track.youtube_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={() => setCurrentVideo(track)}
                             className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                            title="在 YouTube 上播放"
+                            title="播放 YouTube 影片"
                           >
                             <Youtube className="w-4 h-4" />
-                          </a>
+                          </button>
                         )}
                         {track.lastfm_link && (
                           <a
@@ -231,7 +251,41 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
               </div>
             </div>
           </div>
-        </Card>
+          </Card>
+          {currentVideo && (
+            <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-purple-100 shadow-lg z-50">
+              <div className="container mx-auto px-4 max-w-5xl">
+                <div className="flex items-center gap-4 py-3">
+                  <div className="w-80 h-24 bg-black rounded overflow-hidden flex-shrink-0">
+                    <iframe
+                      className="w-full h-full"
+                      src={currentVideo?.youtube_link ? `https://www.youtube.com/embed/${currentVideo.youtube_link.split('v=')[1]}?controls=1&modestbranding=1` : ''}
+                      title="YouTube video player"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className="flex-grow min-w-0">
+                    <div className="font-medium text-purple-900 truncate">
+                      {currentVideo.title}
+                    </div>
+                    <div className="text-sm text-gray-500 truncate">
+                      {currentVideo.artist}
+                    </div>
+                  </div>
+                  <div>
+                    <button
+                      onClick={() => setCurrentVideo(null)}
+                      className="text-purple-500 hover:text-purple-700 p-2 hover:bg-purple-50 rounded-full transition-colors flex-shrink-0"
+                      title="關閉播放器"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
       </main>
     </div>
   )
