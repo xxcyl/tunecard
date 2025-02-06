@@ -4,7 +4,7 @@ import { Header } from "../../../components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Music } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 async function getPlaylist(id: string) {
   // 這裡應該是一個實際的API調用
@@ -34,7 +34,15 @@ async function getPlaylist(id: string) {
 
 export default function PlaylistPage({ params }: { params: { id: string } }) {
   const [currentVideo, setCurrentVideo] = useState<string | null>(null)
-  const playlist = getPlaylist(params.id)
+  const [playlist, setPlaylist] = useState<Awaited<ReturnType<typeof getPlaylist>> | null>(null)
+
+  useEffect(() => {
+    async function fetchPlaylist() {
+      const data = await getPlaylist(params.id)
+      setPlaylist(data)
+    }
+    fetchPlaylist()
+  }, [params.id])
 
   return (
     <div className="min-h-screen bg-apple-gray">
@@ -42,8 +50,8 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
       <main className="container mx-auto px-4 py-12">
         <Card className="bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="text-3xl text-gray-900">{playlist.title}</CardTitle>
-            <CardDescription className="text-gray-600">Created by {playlist.creator}</CardDescription>
+            <CardTitle className="text-3xl text-gray-900">{playlist?.title}</CardTitle>
+            <CardDescription className="text-gray-600">Created by {playlist?.creator}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -59,7 +67,7 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {playlist.tracks.map((track, index) => (
+                  {playlist?.tracks.map((track, index) => (
                     <tr key={index} className="border-b border-gray-200 hover:bg-apple-gray/50 transition-colors">
                       <td className="p-2 text-gray-600">{index + 1}</td>
                       <td className="p-2 text-gray-900">{track.title}</td>
