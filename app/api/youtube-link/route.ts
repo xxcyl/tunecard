@@ -16,8 +16,10 @@ export async function GET(request: Request) {
 
   // 如果沒有 API key，返回搜索連結
   if (!YOUTUBE_API_KEY) {
+    const searchQuery = encodeURIComponent(`${title} ${artist} official music video`)
     return NextResponse.json({
-      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} ${artist} official music video`)}`
+      url: `https://www.youtube.com/results?search_query=${searchQuery}`,
+      embedUrl: null
     })
   }
 
@@ -27,15 +29,24 @@ export async function GET(request: Request) {
     const youtubeData = await youtubeResponse.json()
 
     const videoId = youtubeData.items?.[0]?.id?.videoId
-    const url = videoId 
-      ? `https://www.youtube.com/watch?v=${videoId}`
-      : `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} ${artist} official music video`)}`
-
-    return NextResponse.json({ url })
+    if (videoId) {
+      return NextResponse.json({
+        url: `https://www.youtube.com/watch?v=${videoId}`,
+        embedUrl: `https://www.youtube.com/embed/${videoId}`
+      })
+    } else {
+      const searchQuery = encodeURIComponent(`${title} ${artist} official music video`)
+      return NextResponse.json({
+        url: `https://www.youtube.com/results?search_query=${searchQuery}`,
+        embedUrl: null
+      })
+    }
   } catch (error) {
     console.error('YouTube API error:', error)
+    const searchQuery = encodeURIComponent(`${title} ${artist} official music video`)
     return NextResponse.json({
-      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} ${artist} official music video`)}`
+      url: `https://www.youtube.com/results?search_query=${searchQuery}`,
+      embedUrl: null
     })
   }
 }

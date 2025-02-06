@@ -1,7 +1,10 @@
+"use client"
+
 import { Header } from "../../../components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Music } from "lucide-react"
+import { useState } from "react"
 
 async function getPlaylist(id: string) {
   // 這裡應該是一個實際的API調用
@@ -29,8 +32,9 @@ async function getPlaylist(id: string) {
   }
 }
 
-export default async function PlaylistPage({ params }: { params: { id: string } }) {
-  const playlist = await getPlaylist(params.id)
+export default function PlaylistPage({ params }: { params: { id: string } }) {
+  const [currentVideo, setCurrentVideo] = useState<string | null>(null)
+  const playlist = getPlaylist(params.id)
 
   return (
     <div className="min-h-screen bg-apple-gray">
@@ -66,13 +70,11 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
                         <Button
                           variant="ghost"
                           size="sm"
-                          asChild
                           className="text-apple-blue hover:text-apple-blue/80 hover:bg-apple-gray/50"
+                          onClick={() => setCurrentVideo(track.youtubeLink)}
                         >
-                          <a href={track.youtubeLink} target="_blank" rel="noopener noreferrer">
-                            <Music className="w-4 h-4 mr-2" />
-                            Listen
-                          </a>
+                          <Music className="w-4 h-4 mr-2" />
+                          Listen
                         </Button>
                       </td>
                     </tr>
@@ -81,6 +83,19 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
               </table>
             </div>
           </CardContent>
+          {currentVideo && (
+            <CardContent>
+              <div className="aspect-w-16 aspect-h-9">
+                <iframe
+                  src={currentVideo.replace('music.youtube.com/watch?v=', 'www.youtube.com/embed/')}
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full rounded-lg"
+                />
+              </div>
+            </CardContent>
+          )}
         </Card>
       </main>
     </div>
