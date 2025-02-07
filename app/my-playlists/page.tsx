@@ -82,37 +82,37 @@ export default function MyPlaylists() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+      <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-4 py-12">
-          <div className="text-center">載入中...</div>
+          <div className="text-center text-muted-foreground">載入中...</div>
         </main>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8 text-gray-900">我的播放列表</h1>
+          <h1 className="text-4xl font-bold mb-8 text-foreground">我的歌單</h1>
           
           {playlists.length === 0 ? (
             <div className="text-center py-12">
-              <Music className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600 mb-4">你還沒有建立任何播放列表</p>
-              <Button asChild>
-                <Link href="/create-playlist">建立播放列表</Link>
+              <Music className="w-12 h-12 mx-auto mb-4 text-primary/60" />
+              <p className="text-muted-foreground mb-4">你還沒有建立任何歌單</p>
+              <Button asChild className="bg-primary hover:bg-primary/90">
+                <Link href="/create-playlist">建立歌單</Link>
               </Button>
             </div>
           ) : (
             <div className="grid gap-6">
               {playlists.map((playlist) => (
-                <Card key={playlist.id}>
+                <Card key={playlist.id} className="bg-card border-border/5 hover:border-primary/20 transition-colors">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl">
+                      <CardTitle className="text-xl text-foreground">
                         <Link 
                           href={`/playlists/${playlist.id}`}
                           className="hover:text-primary transition-colors"
@@ -124,6 +124,7 @@ export default function MyPlaylists() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          className="text-muted-foreground hover:text-primary hover:bg-secondary"
                           onClick={() => router.push(`/playlists/${playlist.id}/edit`)}
                         >
                           <Pencil className="w-4 h-4" />
@@ -131,8 +132,9 @@ export default function MyPlaylists() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          className="text-muted-foreground hover:text-destructive hover:bg-secondary"
                           onClick={() => {
-                            if (confirm('確定要刪除這個播放列表嗎？')) {
+                            if (confirm('確定要刪除這個歌單嗎？')) {
                               deletePlaylist(playlist.id)
                             }
                           }}
@@ -143,10 +145,10 @@ export default function MyPlaylists() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-muted-foreground">
                       {playlist.playlist_tracks.length} 首歌曲
                     </div>
-                    <div className="mt-2 text-sm text-gray-500">
+                    <div className="mt-2 text-sm text-muted-foreground/80">
                       建立於 {new Date(playlist.created_at).toLocaleDateString()}
                     </div>
                   </CardContent>

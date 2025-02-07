@@ -201,12 +201,12 @@ export default function CreatePlaylist() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4 text-gray-900">創建 TuneCard</h1>
-          <p className="text-gray-600 mb-8">精選10首你最喜歡的歌曲，分享你的音樂故事。</p>
+          <h1 className="text-4xl font-bold mb-4 text-foreground">創建歌單</h1>
+          <p className="text-muted-foreground mb-8">精選10首你最喜歡的歌曲，分享你的音樂故事。</p>
           
           <div className="mb-8">
             <Input
@@ -231,23 +231,23 @@ export default function CreatePlaylist() {
                 <h2 className="text-xl font-semibold">已添加的歌曲</h2>
                 <div className="space-y-2">
                   {tracks.map((track, index) => (
-                    <Card key={track.id} className="bg-white">
+                    <Card key={track.id} className="bg-card border-border/5 hover:border-primary/20 transition-colors">
                       <CardContent className="flex items-center p-4">
                         <div className="flex items-center gap-4 flex-1 min-w-0">
                           {track.image ? (
                             <img
                               src={track.image}
                               alt={track.title}
-                              className="w-12 h-12 object-cover rounded"
+                              className="w-12 h-12 object-cover rounded ring-1 ring-primary/10"
                             />
                           ) : (
-                            <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                              <Music className="w-6 h-6 text-gray-400" />
+                            <div className="w-12 h-12 bg-primary/10 rounded flex items-center justify-center">
+                              <Music className="w-6 h-6 text-primary" />
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium truncate">{track.title}</div>
-                            <div className="text-sm text-gray-500 truncate">
+                            <div className="font-medium truncate text-foreground">{track.title}</div>
+                            <div className="text-sm text-muted-foreground truncate">
                               {track.artist}
                               {track.album && ` • ${track.album}`}
                             </div>
@@ -257,7 +257,7 @@ export default function CreatePlaylist() {
                                   href={track.youtube_link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-red-500 hover:text-red-600"
+                                  className="text-primary hover:text-primary/80"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   YouTube
@@ -268,7 +268,7 @@ export default function CreatePlaylist() {
                                   href={track.lastfm_link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-blue-500 hover:text-blue-600"
+                                  className="text-primary hover:text-primary/80"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   Last.fm
@@ -280,7 +280,7 @@ export default function CreatePlaylist() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-gray-400 hover:text-red-500"
+                          className="text-muted-foreground hover:text-destructive"
                           onClick={() => removeTrack(track.id)}
                         >
                           <Trash2 className="w-4 h-4" />

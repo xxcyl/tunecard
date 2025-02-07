@@ -37,10 +37,11 @@ export default function DeletePlaylist({ playlistId }: { playlistId: string }) {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="sm"
       onClick={handleDelete}
       disabled={isDeleting}
+      className="border-primary/20 hover:bg-primary/10 hover:text-destructive transition-colors"
     >
       <Trash2 className="w-4 h-4" />
     </Button>

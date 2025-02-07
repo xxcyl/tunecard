@@ -43,19 +43,19 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto">
-          <h1 className="text-4xl font-bold mb-4 text-gray-900">歡迎使用</h1>
-          <p className="text-gray-600 mb-8">
+          <h1 className="text-4xl font-bold mb-4 text-foreground">歡迎使用</h1>
+          <p className="text-muted-foreground mb-8">
             目前處於封閉測試階段，僅開放受邀用戶使用。
             如果您收到邀請郵件，請使用該郵件地址登入。
           </p>
-          <div className="bg-white p-8 rounded-lg shadow-sm">
+          <div className="bg-card p-8 rounded-lg shadow-lg border border-border/5">
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-foreground">
                   電子郵件
                 </label>
                 <Input
@@ -64,11 +64,11 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="mt-1"
+                  className="mt-1 bg-background border-border/10"
                 />
               </div>
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-foreground">
                   密碼
                 </label>
                 <Input
@@ -77,15 +77,15 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="mt-1"
+                  className="mt-1 bg-background border-border/10"
                 />
               </div>
               {error && (
-                <div className="text-red-500 text-sm">{error}</div>
+                <div className="text-destructive text-sm">{error}</div>
               )}
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full bg-primary hover:bg-primary/90"
                 disabled={loading}
               >
                 {loading ? '登入中...' : '登入'}

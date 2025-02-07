@@ -49,18 +49,18 @@ export default function PlaylistsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-8">所有列表</h1>
+        <h1 className="text-3xl font-bold mb-8 text-foreground">所有列表</h1>
         {loading ? (
-          <div className="text-center">載入中...</div>
+          <div className="text-center text-muted-foreground">載入中...</div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {playlists.map((playlist) => (
               <Link key={playlist.id} href={`/playlists/${playlist.id}`}>
-                <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-lg transition-colors">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden">
+                <div className="flex items-center gap-4 p-4 bg-card hover:bg-secondary rounded-lg transition-colors group border border-border/5 hover:border-primary/20">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden ring-1 ring-primary/10">
                     {playlist.playlist_tracks[0]?.image ? (
                       <img 
                         src={playlist.playlist_tracks[0].image} 
@@ -68,20 +68,20 @@ export default function PlaylistsPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-purple-100 flex items-center justify-center">
-                        <Music2 className="w-6 h-6 text-purple-600" />
+                      <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                        <Music2 className="w-6 h-6 text-primary" />
                       </div>
                     )}
                   </div>
                   <div className="flex-grow min-w-0">
-                    <h3 className="text-lg font-semibold truncate">{playlist.name}</h3>
+                    <h3 className="text-lg font-semibold truncate text-foreground group-hover:text-primary transition-colors">{playlist.name}</h3>
                     {playlist.description && (
-                      <p className="text-sm text-gray-500 truncate">{playlist.description}</p>
+                      <p className="text-sm text-muted-foreground truncate">{playlist.description}</p>
                     )}
                   </div>
-                  <div className="flex-shrink-0 text-sm text-gray-500 text-right">
-                    <p>由 {playlist.profiles.username} 建立</p>
-                    <p>{playlist.playlist_tracks.length} 首歌曲</p>
+                  <div className="flex-shrink-0 text-sm text-muted-foreground text-right">
+                    <p className="group-hover:text-primary/80 transition-colors">由 {playlist.profiles.username} 建立</p>
+                    <p className="text-primary/60">{playlist.playlist_tracks.length} 首歌曲</p>
                   </div>
                 </div>
               </Link>
