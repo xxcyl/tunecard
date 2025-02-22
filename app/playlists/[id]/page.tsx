@@ -7,8 +7,9 @@ import { Youtube, Music2, ExternalLink, Pencil, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { formatDuration } from '@/utils/format'
 import DeletePlaylist from './delete-button'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
 
 
 interface Track {
@@ -38,58 +39,82 @@ interface Playlist {
 }
 
 export default function PlaylistPage({ params }: { params: { id: string } }) {
+  const router = useRouter()
   const [currentVideo, setCurrentVideo] = useState<Track | null>(null)
-
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true)
+        setError(null)
         const supabase = createClientComponentClient()
         
-        // 獲取用戶資訊
-        const { data: { user } } = await supabase.auth.getUser()
-        setUser(user)
+        // 同時獲取用戶資訊和播放列表資訊
+        const [userResponse, playlistResponse] = await Promise.all([
+          supabase.auth.getUser(),
+          supabase
+            .from('playlists')
+            .select(`
+              *,
+              profiles (username, avatar_url),
+              playlist_tracks (*)
+            `)
+            .eq('id', params.id)
+            .single()
+        ])
 
-        // 獲取播放列表資訊
-        const { data: playlist, error: playlistError } = await supabase
-          .from('playlists')
-          .select(`
-            *,
-            profiles (username, avatar_url),
-            playlist_tracks (*)
-          `)
-          .eq('id', params.id)
-          .single()
+        setUser(userResponse.data.user)
 
-        if (playlistError) {
-          console.error('Error fetching playlist:', playlistError)
-          window.location.href = '/'
-          return
+        if (playlistResponse.error) {
+          throw new Error(playlistResponse.error.message)
         }
 
-        setPlaylist(playlist)
-      } catch (error) {
+        if (!playlistResponse.data) {
+          throw new Error('Playlist not found')
+        }
+
+        setPlaylist(playlistResponse.data)
+      } catch (error: any) {
         console.error('Error:', error)
+        setError(error.message || '載入播放清單時發生錯誤')
+        // 使用 router.push 替代 window.location
+        router.push('/')
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [params.id])
+  }, [params.id, router])
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-red-500 mb-4">錯誤</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={() => router.push('/')}>返回首頁</Button>
+          </div>
+        </main>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-64 bg-primary/10 rounded-lg mb-4 ring-1 ring-primary/20"></div>
-            <div className="h-8 bg-primary/10 rounded w-1/3 mb-2 ring-1 ring-primary/20"></div>
+          <div className="animate-pulse space-y-4">
+            <div className="h-64 bg-primary/10 rounded-lg ring-1 ring-primary/20"></div>
+            <div className="h-8 bg-primary/10 rounded w-1/3 ring-1 ring-primary/20"></div>
             <div className="h-4 bg-primary/10 rounded w-1/4 ring-1 ring-primary/20"></div>
           </div>
         </main>
