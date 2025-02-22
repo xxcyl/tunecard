@@ -12,6 +12,19 @@ export const contentType = 'image/png'
 export default async function Image({ params }: { params: { id: string } }) {
   try {
     const supabase = createClientComponentClient()
+    type PlaylistResponse = {
+      name: string;
+      description: string;
+      profiles: {
+        username: string;
+        avatar_url: string;
+      };
+      playlist_tracks: {
+        image: string;
+        title: string;
+      }[];
+    }
+
     const { data: playlist } = await supabase
       .from('playlists')
       .select(`
@@ -24,7 +37,7 @@ export default async function Image({ params }: { params: { id: string } }) {
         )
       `)
       .eq('id', params.id)
-      .single()
+      .single() as { data: PlaylistResponse | null }
 
     if (!playlist) {
       throw new Error('Playlist not found')
