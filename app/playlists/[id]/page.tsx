@@ -8,10 +8,10 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import {
   FacebookShareButton,
-  TwitterShareButton,
-  FacebookIcon,
-  TwitterIcon
+  TwitterShareButton
 } from 'react-share'
+import { FaFacebook } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
 import { formatDuration } from '@/utils/format'
 import DeletePlaylist from './delete-button'
 import { useState, useEffect, useRef, Suspense } from 'react'
@@ -232,17 +232,15 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <FacebookShareButton
                     url={`${window.location.origin}/playlists/${params.id}`}
-                    title={`來聽聽這個播放清單：${playlist?.name}
-${window.location.origin}/playlists/${params.id}`}
+                    title={`來聽聽這個播放清單：${playlist?.name}`}
                     hashtag="#TuneCard"
                   >
                     <Button
                       variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2 border-primary/20 hover:bg-primary/10"
+                      size="icon"
+                      className="border-primary/20 hover:bg-primary/10"
                     >
-                      <FacebookIcon size={20} round />
-                      <span>分享到 Facebook</span>
+                      <FaFacebook className="h-4 w-4" />
                     </Button>
                   </FacebookShareButton>
 
@@ -253,18 +251,17 @@ ${window.location.origin}/playlists/${params.id}`}
                   >
                     <Button
                       variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2 border-primary/20 hover:bg-primary/10"
+                      size="icon"
+                      className="border-primary/20 hover:bg-primary/10"
                     >
-                      <TwitterIcon size={20} round />
-                      <span>分享到 X</span>
+                      <FaXTwitter className="h-4 w-4" />
                     </Button>
                   </TwitterShareButton>
 
                   <Button
                     variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2 border-primary/20 hover:bg-primary/10"
+                    size="icon"
+                    className="border-primary/20 hover:bg-primary/10"
                     onClick={handleCopyLink}
                   >
                     {isCopied ? (
@@ -272,7 +269,6 @@ ${window.location.origin}/playlists/${params.id}`}
                     ) : (
                       <Copy className="h-4 w-4" />
                     )}
-                    {isCopied ? '已複製' : '複製連結'}
                   </Button>
                 </div>
                 {user?.id === playlist.user_id && (
