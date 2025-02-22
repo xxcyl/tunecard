@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
     const trackCount = playlist.playlist_tracks.length
     const description = playlist.description || 
-      `A playlist by ${playlist.profiles.username || 'Anonymous'} with ${trackCount} tracks`
+      `A playlist by ${playlist.profiles?.username || 'Anonymous'} with ${trackCount} tracks`
 
     return {
       title: `${playlist.name} - TuneCard`,
