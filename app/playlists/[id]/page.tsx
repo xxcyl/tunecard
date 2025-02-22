@@ -232,7 +232,7 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <FacebookShareButton
                     url={`${window.location.origin}/playlists/${params.id}`}
-                    title={`來聽聽這個播放清單：${playlist?.name}`}
+                    quote={`來聽聽這個播放清單「${playlist?.name}」，包含 ${playlist?.playlist_tracks.length} 首歌曲。立即在 TuneCard 收聽！`}
                     hashtag="#TuneCard"
                   >
                     <Button

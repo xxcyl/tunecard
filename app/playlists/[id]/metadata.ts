@@ -33,18 +33,26 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
     const trackCount = playlist.playlist_tracks.length
     const description = playlist.description || 
-      `A playlist by ${playlist.profiles.username || 'Anonymous'} with ${trackCount} tracks`
+      `由 ${playlist.profiles.username || '匿名用戶'} 創建的音樂播放清單「${playlist.name}」，包含 ${trackCount} 首歌曲。立即在 TuneCard 收聽！`
 
     return {
       title: `${playlist.name} - TuneCard`,
       description,
       openGraph: {
-        title: playlist.name,
+        title: `${playlist.name} - TuneCard`,
         description,
         type: 'music.playlist',
         siteName: 'TuneCard',
         locale: 'zh_TW',
-        images: [`${process.env.NEXT_PUBLIC_APP_URL || 'https://tunecard.vercel.app'}/playlists/${params.id}/opengraph-image`],
+        url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://tunecard.vercel.app'}/playlists/${params.id}`,
+        images: [
+          {
+            url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://tunecard.vercel.app'}/playlists/${params.id}/opengraph-image?v=${Date.now()}`,
+            width: 1200,
+            height: 630,
+            alt: `${playlist.name} - TuneCard`,
+          }
+        ],
       },
       alternates: {
         canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://tunecard.vercel.app'}/playlists/${params.id}`,

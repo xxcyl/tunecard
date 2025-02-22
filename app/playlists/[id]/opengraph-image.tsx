@@ -2,6 +2,8 @@ import { ImageResponse } from 'next/og'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 export const alt = 'Playlist Cover'
 export const size = {
   width: 1200,
