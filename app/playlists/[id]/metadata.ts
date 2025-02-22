@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
         description,
         type: 'music.playlist',
         siteName: 'TuneCard',
-        images: [`/playlists/${params.id}/opengraph-image`],
+        images: [`${process.env.NEXT_PUBLIC_APP_URL || 'https://tunecard.vercel.app'}/playlists/${params.id}/opengraph-image`],
       },
       twitter: {
         card: 'summary_large_image',
