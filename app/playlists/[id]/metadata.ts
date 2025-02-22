@@ -49,9 +49,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       alternates: {
         canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://tunecard.vercel.app'}/playlists/${params.id}`,
       },
-      other: {
+      other: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID ? {
         'fb:app_id': process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
-      },
+      } : {},
       twitter: {
         card: 'summary_large_image',
         title: playlist.name,
