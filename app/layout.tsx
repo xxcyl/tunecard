@@ -3,6 +3,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import { Providers } from './providers'
+import { Toaster } from 'sonner'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="zh-TW">
       <body className={`${inter.variable} font-sans`}>
         <Providers>{children}</Providers>
+        <Toaster />
         <Analytics />
       </body>
     </html>

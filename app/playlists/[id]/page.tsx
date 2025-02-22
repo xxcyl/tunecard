@@ -1,10 +1,17 @@
-"use client"
+  "use client"
 
 import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Card, CardContent } from '@/components/ui/card'
-import { Youtube, Music2, ExternalLink, Pencil, Trash2, X } from 'lucide-react'
+import { Youtube, Music2, ExternalLink, Pencil, Trash2, Copy, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  FacebookIcon,
+  TwitterIcon
+} from 'react-share'
 import { formatDuration } from '@/utils/format'
 import DeletePlaylist from './delete-button'
 import { useState, useEffect, useRef, Suspense } from 'react'
@@ -45,6 +52,31 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isCopied, setIsCopied] = useState(false)
+
+  const handleCopyLink = async () => {
+    const shareUrl = `${window.location.origin}/playlists/${params.id}`
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setIsCopied(true)
+      toast.success('已複製連結')
+      setTimeout(() => setIsCopied(false), 2000)
+    } catch (err) {
+      toast.error('複製連結失敗')
+    }
+  }
+
+  const handleFacebookShare = () => {
+    const shareUrl = `${window.location.origin}/playlists/${params.id}`
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+    window.open(facebookShareUrl, '_blank', 'width=600,height=400')
+  }
+
+  const handleTwitterShare = () => {
+    const shareUrl = `${window.location.origin}/playlists/${params.id}`
+    const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`Check out this playlist: ${playlist?.name || ''}`)}`
+    window.open(twitterShareUrl, '_blank', 'width=600,height=400')
+  }
 
 
   useEffect(() => {
@@ -196,6 +228,52 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
                 </div>
                 <div className="mt-2 text-sm text-muted-foreground">
                   創建於 {new Date(playlist.created_at).toLocaleDateString()}
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <FacebookShareButton
+                    url={`${window.location.origin}/playlists/${params.id}`}
+                    title={`來聽聽這個播放清單：${playlist?.name}
+${window.location.origin}/playlists/${params.id}`}
+                    hashtag="#TuneCard"
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 border-primary/20 hover:bg-primary/10"
+                    >
+                      <FacebookIcon size={20} round />
+                      <span>分享到 Facebook</span>
+                    </Button>
+                  </FacebookShareButton>
+
+                  <TwitterShareButton
+                    url={`${window.location.origin}/playlists/${params.id}`}
+                    title={`來聽聽這個播放清單：${playlist?.name}`}
+                    hashtags={['TuneCard', 'Music']}
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 border-primary/20 hover:bg-primary/10"
+                    >
+                      <TwitterIcon size={20} round />
+                      <span>分享到 X</span>
+                    </Button>
+                  </TwitterShareButton>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 border-primary/20 hover:bg-primary/10"
+                    onClick={handleCopyLink}
+                  >
+                    {isCopied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    {isCopied ? '已複製' : '複製連結'}
+                  </Button>
                 </div>
                 {user?.id === playlist.user_id && (
                   <div className="mt-6 flex gap-2">
