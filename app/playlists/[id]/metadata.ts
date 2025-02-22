@@ -46,8 +46,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
         locale: 'zh_TW',
         images: [`${process.env.NEXT_PUBLIC_APP_URL || 'https://tunecard.vercel.app'}/playlists/${params.id}/opengraph-image`],
       },
-      facebook: {
-        appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+      alternates: {
+        canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://tunecard.vercel.app'}/playlists/${params.id}`,
+      },
+      other: {
+        'fb:app_id': process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
       },
       twitter: {
         card: 'summary_large_image',
