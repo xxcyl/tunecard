@@ -4,6 +4,15 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
     const supabase = createClientComponentClient()
+    type PlaylistResponse = {
+      name: string;
+      description: string;
+      profiles: {
+        username: string;
+      };
+      playlist_tracks: any[];
+    }
+
     const { data: playlist } = await supabase
       .from('playlists')
       .select(`
@@ -13,7 +22,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
         playlist_tracks (title)
       `)
       .eq('id', params.id)
-      .single()
+      .single() as { data: PlaylistResponse | null }
 
     if (!playlist) {
       return {
@@ -24,7 +33,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
     const trackCount = playlist.playlist_tracks.length
     const description = playlist.description || 
-      `A playlist by ${playlist.profiles?.username || 'Anonymous'} with ${trackCount} tracks`
+      `A playlist by ${playlist.profiles.username || 'Anonymous'} with ${trackCount} tracks`
 
     return {
       title: `${playlist.name} - TuneCard`,
